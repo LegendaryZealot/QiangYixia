@@ -63,27 +63,17 @@ public class WechatVersionUtils {
         return versionVerificationGreaterThanOK(18);
     }
 
-    static int oneVersionCode = 680;
-    static int twoVersionCode = 700;
-    static int threeVersionCode = 720;
-    static int fourVersionCode = 740;
-    static int fiveVersionCode = 760;
-    static int sixVersionCode = 780;
-    static int sevenVersionCode = 800;
+
     static int eightVersionCode = 821;
     static int nineVersionCode = 840;
-    static int tenVersionCode=980;
+    static int tenVersionCode = 980;
+    static int elevenVersionCode = 1000;
 
-    static String oneVersionName = "6.3.8";
-    static String twoVersionName = "6.3.9";
-    static String threeVersionName = "6.3.11";
-    static String fourVersionName = "6.3.13";
-    static String fiveVersionName = "6.3.15";
-    static String sixVersionName = "6.3.16";
-    static String sevenVersionName = "6.3.18";
+
     static String eightVersionName = "6.3.22";
     static String nineVersionName = "6.3.23";
-    static String tenVersionName="6.5.3";
+    static String tenVersionName = "6.5.3";
+    static String elevenVersionName = "6.5.4";
 
 
     /**
@@ -155,6 +145,11 @@ public class WechatVersionUtils {
          * versionName:6.5.3  versionCode:980
          */
         TEN,
+
+        /**
+         * 6.5.4  versionCode:1000
+         */
+        ELEVEN,
         /**
          * 未知的微信版本
          */
@@ -330,9 +325,7 @@ public class WechatVersionUtils {
             detail_money_number_id = "com.tencent.mm:id/b8t";
             // 发红包的人
             detail_send_money_people_id = "com.tencent.mm:id/b8p";
-        }
-
-        else if (wechatVersion == WechatVersion.TEN) {
+        } else if (wechatVersion == WechatVersion.TEN) {
             // code=980,name=6.5.3
 
                        /*
@@ -352,22 +345,33 @@ public class WechatVersionUtils {
             wechat_get_red_packet_id = "com.tencent.mm:id/a56";
             // 聊天列表
             wechat_list_id = "com.tencent.mm:id/a1d";
-            // 编辑框
-            wechat_edit_text_id = "com.tencent.mm:id/z4";
-            // 表情
-            wechat_edit_text_image_button_id = "com.tencent.mm:id/z5";
-            // 发送按钮
-            wechat_send_button_id = "com.tencent.mm:id/z_";
 
             /*
             详情界面的
             */
             // 详情界面退出按钮(取按钮的上一级)
             detail_exit_id = "com.tencent.mm:id/gr";
-            // 金额
-            detail_money_number_id = "com.tencent.mm:id/b8t";
-            // 发红包的人
-            detail_send_money_people_id = "com.tencent.mm:id/b8p";
+        } else if (wechatVersion == WechatVersion.ELEVEN) {
+            // 弹框退出按钮
+            dialog_exit_button_id = "com.tencent.mm:id/bed";
+            // 开
+            dialog_open_money_id = "com.tencent.mm:id/bi3";
+
+            /*
+            聊天界面
+            */
+            // 聊天界面退出(取按钮的上一级)
+            wechat_exit_id = "com.tencent.mm:id/gf";
+            // 领取红包按钮
+            wechat_get_red_packet_id = "com.tencent.mm:id/a5u";
+            // 聊天列表
+            wechat_list_id = "com.tencent.mm:id/a22";
+
+            /*
+            详情界面的
+                    */
+            // 详情界面退出按钮
+            detail_exit_id = "com.tencent.mm:id/gv";
         }
 
         String id = "";
@@ -411,32 +415,16 @@ public class WechatVersionUtils {
             int versionCode = packageInfo.versionCode;
 //            hello.hongbaoqiangguang.util.UIUtils.println("微信的 versionName:" + versionName + "  versionCode:" + versionCode);
             System.out.println("微信的 versionName:" + versionName + "  versionCode:" + versionCode);
-            if (versionCode == oneVersionCode && versionName.contains(oneVersionName)) {
-                wechatVersion = WechatVersion.ONE;
-            } else if (versionCode == twoVersionCode && versionName.contains(twoVersionName)) {
-                wechatVersion = WechatVersion.TWO;
-            } else if (versionCode == threeVersionCode && versionName.contains(threeVersionName)) {
-                wechatVersion = WechatVersion.THREE;
-            } else if ((versionCode == 700 && versionName.equals("6.3.11.25_rf2ef403"))) {
-                // 微信6.3.11内测版
-                wechatVersion = WechatVersion.THREE;
-            } else if (versionCode == fourVersionCode && versionName.contains(fourVersionName)) {
-                wechatVersion = WechatVersion.FOUR;
-            } else if (versionCode == fiveVersionCode && versionName.contains(fiveVersionName)) {
-                wechatVersion = WechatVersion.FIVE;
-            } else if (versionCode == sixVersionCode && versionName.contains(sixVersionName)) {
-                wechatVersion = WechatVersion.SIX;
-            } else if (versionCode == sevenVersionCode && versionName.contains(sevenVersionName)) {
-                wechatVersion = WechatVersion.SEVEN;
-            } else if (versionCode == eightVersionCode && versionName.contains(eightVersionName)) {
+            if (versionCode == eightVersionCode && versionName.contains(eightVersionName)) {
                 wechatVersion = WechatVersion.EIGHT;
             } else if (versionCode == nineVersionCode && versionName.contains(nineVersionName)) {
                 wechatVersion = WechatVersion.NINE;
-            }else if(versionCode == tenVersionCode && versionName.contains(tenVersionName))
-            {
-                wechatVersion=WechatVersion.TEN;
+            } else if (versionCode == tenVersionCode && versionName.contains(tenVersionName)) {
+                wechatVersion = WechatVersion.TEN;
+            } else if (versionCode == elevenVersionCode && versionName.contains(elevenVersionName)) {
+                wechatVersion = WechatVersion.ELEVEN;
             }
-
+            System.out.println("最终的结果是" + wechatVersion);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -493,9 +481,10 @@ public class WechatVersionUtils {
             canRob = true;
         } else if (wechatVersion == WechatVersion.NINE) {
             canRob = true;
-        }else if(wechatVersion==WechatVersion.TEN)
-        {
-            canRob=true;
+        } else if (wechatVersion == WechatVersion.TEN) {
+            canRob = true;
+        } else if (wechatVersion == WechatVersion.ELEVEN) {
+            canRob = true;
         }
         return canRob;
     }

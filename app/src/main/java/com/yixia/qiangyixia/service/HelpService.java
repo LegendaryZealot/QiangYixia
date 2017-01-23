@@ -68,6 +68,7 @@ public class HelpService extends AccessibilityService {
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         try {
+
             if (context == null) {
                 context = getApplicationContext();
             }
@@ -774,7 +775,7 @@ public class HelpService extends AccessibilityService {
             if (redMoneyItems != null && redMoneyItems.size() > 0) {
                 AccessibilityNodeInfo nodeInfo1 = redMoneyItems.get(redMoneyItems.size() - 1);
                 S(" 要开始点击红包了:" + nodeInfo1.getText().toString());
-                if (nodeInfo1.getText().toString().equals("查看红包")) {
+                if (nodeInfo1.getText().toString().equals("查看红包")||nodeInfo1.getText().toString().equals("领取红包")) {
                     // TODO 是否抢自己的红包
                     boolean isRobSelf = true;
                     if (!isRobSelf) {
