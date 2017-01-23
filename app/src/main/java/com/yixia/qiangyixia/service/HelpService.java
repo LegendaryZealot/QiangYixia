@@ -32,12 +32,10 @@ public class HelpService extends AccessibilityService {
      * 微信的包名
      */
     public static final String WECHAT_PACKAGENAME = "com.tencent.mm";
-    public static final String QQ_PACKAGENAME = "com.tencent.mobileqq";
     /**
      * 红包消息的关键字
      */
     final String WECHAT_HONGBAO_TEXT_KEY = "[微信红包]";
-    final String QQ_HONGBAO_TEXT_KEY = "[QQ红包]";
     private String TAG = "guoguo";
     private boolean isNotDO = false;    // 是否下一次接收时不处理。
     private Handler mHandler = new MHandler() {
@@ -69,8 +67,6 @@ public class HelpService extends AccessibilityService {
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-
-        // 接收事件,如触发了通知栏变化、界面变化等
         try {
             if (context == null) {
                 context = getApplicationContext();
@@ -78,20 +74,13 @@ public class HelpService extends AccessibilityService {
             if (sharedPerferenceUtil == null) {
                 sharedPerferenceUtil = SharedPerferenceUtil.getInstance(context);
             }
-            // TODO 是否要运行抢红包
+
             boolean isOpen = sharedPerferenceUtil.getBoolean(Constant.IS_RUNNING_SERVICE, true);
             if (!isOpen) {
-                // 如果关掉了，就不继续执行了
                 return;
             }
 
             if (event.getPackageName().toString().equals(WECHAT_PACKAGENAME)) {
-                // 微信
-
-
-//            S("  测试:" + event.getClassName() + "  content：" + event.getText());
-
-//            android.widget.Toast$TN  content：[请勿使用红包辅助软件，3天内暂时无法领取红包]
                 if (event.getText() != null && event.getText().size() > 0 &&
                         (event.getText().get(0).toString().contains("请勿使用红包辅助软件"))
                         && "android.widget.Toast$TN".equals(event.getClassName())) {
@@ -108,7 +97,6 @@ public class HelpService extends AccessibilityService {
                 if (event.getText() != null && event.getText().size() > 0 &&
                         (event.getText().get(0).equals("请求不成功，请稍后再试") || event.getText().get(0).equals("系统繁忙，请稍后再试"))
                         && "android.widget.Toast$TN".equals(event.getClassName())) {
-                    // 如果是请求失败，不做处理，并且
                     isNotDO = true;
                     return;
                 }
@@ -131,14 +119,12 @@ public class HelpService extends AccessibilityService {
                 } else if (eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
 
                     S("界面改变");
-                    // 界面改变
                     try {
                         openHongBao(event);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 } else if (eventType == AccessibilityEvent.TYPE_VIEW_SCROLLED) {
-                    // 滑动改变监听。,判断最下面的是不是有红包
                     S("滑动改变11111");
                     CharSequence className = event.getClassName();
                     if (className.equals("android.widget.ListView")) {
@@ -146,13 +132,6 @@ public class HelpService extends AccessibilityService {
                         robNewRedMoney(event);
                     }
                 } else if (eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) {
-//            S("  内容改变了~ - ~界面~");
-                    // 判断是不是主界面和聊天界面之间跳转，如果是两个界面之间跳转
-                    // 将是否一直在聊天界面的值置为false。
-                    // 如果一直在聊天界面，并且没有打开通知栏，我就不管界面改变的广播
-
-
-                    // 新：判断是不是聊天界面，如果是，就把ListView抓出来，看看是不是条目变多了，如果是，就把最后一个拉出来判断是不是红包
                     contentChange(event);
                 }
             }
@@ -194,7 +173,6 @@ public class HelpService extends AccessibilityService {
      * @param event
      */
     private void robNewRedMoney(AccessibilityEvent event) {
-        // 首先判断是不是聊天界面，如果是，判断最下面一个是不是红包。红包个数没有变多的话，就不管
         AccessibilityNodeInfo root = getRootInActiveWindow();
         if (root == null) {
             return;
@@ -215,7 +193,6 @@ public class HelpService extends AccessibilityService {
                     sharedPerferenceUtil.putInteger(Constant.WECHAT_UI_LIST_COUNT, itemCount);
                     int i = itemCount - oldCount;
                     if (i <= 0) {
-                        // 判断消息数有没有变多，如果没有，就不是有新消息，不用理会
                         return;
                     }
                     S("走到这里咯啊吗？11111");
@@ -226,7 +203,6 @@ public class HelpService extends AccessibilityService {
                     S("走到这里咯啊吗？2222");
                     List<AccessibilityNodeInfo> getRedMoneyList = nodeInfo.findAccessibilityNodeInfosByViewId(WechatVersionUtils.getWechatGetRedMoneyId(context));
                     if (getRedMoneyList != null && getRedMoneyList.size() > 0) {
-                        // 最下面一个是可抢红包
                         try {
                             isNotDO = false;
                             S("走到这里咯啊吗？3333");
@@ -249,7 +225,6 @@ public class HelpService extends AccessibilityService {
             return;
         }
 
-        // 以下是精华，将微信的通知栏消息打开
         Notification notification = (Notification) event.getParcelableData();
         if (notification == null) {
             return;
@@ -532,18 +507,14 @@ public class HelpService extends AccessibilityService {
 
             try {
                 List<AccessibilityNodeInfo> openList = nodeInfo.findAccessibilityNodeInfosByText("给你发了一个红包");
-//                S(" 正在找開字");
                 for (AccessibilityNodeInfo n : openList) {
                     AccessibilityNodeInfo parent = n.getParent();
                     for (int i = 0; i < parent.getChildCount(); i++) {
                         CharSequence text = parent.getChild(i).getText();
-//                        S(" 找到：" + text);
                     }
 
                     parent.getChild(parent.getChildCount() - 2).performAction(AccessibilityNodeInfo.ACTION_CLICK);
                     isClickOpenMoney = true;
-//                    S(" 有找到開字；非常OK");
-//            n.performAction(AccessibilityNodeInfo.ACTION_CLICK);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -583,11 +554,8 @@ public class HelpService extends AccessibilityService {
                 return;
             }
 
-//        S("  是 判断 支持的版y本");
             if (WechatVersionUtils.canFindViewById(context) && WechatVersionUtils.canRobWechatVersion(context)) {
-                // 系统在4.3以上，并且微信版本我们支持的运行id抢红包，否则就用普通方式抢
-                // 判断在哪个界面，通过聊天界面独有的返回按钮判断
-                boolean isWechatUI; // 是否是聊天界面
+                boolean isWechatUI;
                 List<AccessibilityNodeInfo> exitNodeInfos = nodeInfo.findAccessibilityNodeInfosByViewId(WechatVersionUtils.getWechatExitId(context));
                 if (exitNodeInfos != null && exitNodeInfos.size() > 0) {
                     isWechatUI = true;
@@ -597,7 +565,7 @@ public class HelpService extends AccessibilityService {
                     }
 
                     if (!isOpenNotification) {
-//                    S(" 不是通知栏进来的~~我不点~");
+
                         closeLockScreen();
                         return;
                     }
@@ -612,8 +580,6 @@ public class HelpService extends AccessibilityService {
                     WeChatUIRobRedMoney(nodeInfo);
 
                 } else {
-                    // 是主界面，
-                    // 不管，因为主界面有新的消息会走通知栏的
                     WeChatUIRobRedMoney(nodeInfo);
                 }
 
@@ -828,27 +794,18 @@ public class HelpService extends AccessibilityService {
 
     @Override
     public void onInterrupt() {
-
-        // 服务中断，如授权关闭或者将服务杀死
-//        Toast.makeText(this, "辅助服务被中断", Toast.LENGTH_SHORT).show();
         if (context == null) {
             context = getApplicationContext();
         }
         if (sharedPerferenceUtil == null) {
             sharedPerferenceUtil = SharedPerferenceUtil.getInstance(context);
         }
-        // 发送服务停止广播，并将状态存储
-//        sendBroadcast(new Intent(Constant.ACTION_HONG_BAO_QIANG_GUANG_SERVICE_STOP));
-//        sharedPerferenceUtil.putBoolean(Constant.HONG_BAO_QIANG_GUANG_SERVICE_STATE, false);
-
     }
 
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
 
-
-        // 连接服务成功，发送成功广播，并将状态改变为运行中--
         if (context == null) {
             context = getApplicationContext();
         }
@@ -862,8 +819,6 @@ public class HelpService extends AccessibilityService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
-        // 发送服务停止广播，并将状态存储
         if (context == null) {
             context = getApplicationContext();
         }
